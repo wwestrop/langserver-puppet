@@ -1,5 +1,5 @@
 
-import { ContextResolver } from '../src/types/ContextResolver'
+import { ContextResolver } from '../types/ContextResolver'
 
 describe('Resolving the auto-completion context', () => {
 
