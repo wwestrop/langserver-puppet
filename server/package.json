@@ -11,11 +11,15 @@
     "vscode-languageserver": "^3.1.0"
   },
   "devDependencies": {
+    "@types/mocha": "^2.2.41",
     "@types/node": "^6.0.52",
+    "mocha": "^3.4.2",
+    "should": "^11.2.1",
     "typescript": "^2.1.5"
   },
   "scripts": {
     "compile": "installServerIntoExtension ../client ./package.json ./tsconfig.json && tsc -p .",
-    "watch": "installServerIntoExtension ../client ./package.json ./tsconfig.json && tsc --watch -p ."
+    "watch": "installServerIntoExtension ../client ./package.json ./tsconfig.json && tsc --watch -p .",
+    "test": "tsc & mocha ../client/server/test/**/*.js"
   }
 }
