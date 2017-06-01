@@ -1,5 +1,7 @@
+import { ParameterContext } from '../completionContexts/ICompletionContext';
 
 import { ContextResolver } from '../types/ContextResolver'
+// const should = require('should');
 
 describe('Resolving the auto-completion context', () => {
 
@@ -66,6 +68,10 @@ describe('Resolving the auto-completion context', () => {
         it('Should list the parameters available for that resource', function() {
             const manifestContent = `declare myresource {
                 file { '/var/log/nginx.log': `;
+            
+            const result = sut.resolve(manifestContent, 12);
+            const w5 = <any>result instanceof ParameterContext;
+
             throw "Test not implemented";
         });
         it('Should not list parameters that have already been set within this resource declaration', function() {

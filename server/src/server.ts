@@ -1,3 +1,5 @@
+import { ContextResolver } from './types/contextResolver';
+import { ICompletionContext } from './completionContexts/ICompletionContext';
 /* --------------------------------------------------------------------------------------------
 * Copyright (c) Microsoft Corporation. All rights reserved.
 * Licensed under the MIT License. See License.txt in the project root for license information.
@@ -70,6 +72,14 @@ connection.onDidChangeConfiguration((change) => {
 // This handler provides the initial list of the completion items.
 connection.onCompletion((textDocumentPosition: TextDocumentPositionParams): CompletionItem[] => {
 
+	const relevantDocument = documents.all().find(d => d.uri == textDocumentPosition.textDocument.uri);
+	if (!relevantDocument) return [];
+
+    const index = relevantDocument.offsetAt(textDocumentPosition.position);
+	// const completionContext = ContextResolver.resolve(relevantDocument.getText(), index);
+
+	// return completionContext.getCompletionItems();
+
 	// This is a naive parser, rather than re-parsing on every change, the way it works is basically this:
 	// From the current text entry point, walk back until we see what looks like:
 	// 		An include statement (autoprovide the list of available modules/classes)
@@ -115,48 +125,11 @@ connection.onCompletion((textDocumentPosition: TextDocumentPositionParams): Comp
 /** Reads backwards from the current insertion point to determine what "scope" the editor is in,
  *  and hence what information the user will want available for autocompleting. 
  */
-function getScope(): ICompletionScope {
+function getScope(): ICompletionContext {
+	// TODO move to factory - use contextResolver
 	throw "Not implemented";
 }
 
-interface ICompletionScope {
-	getCompletionItems(): CompletionItem[];
-}
-
-/** The top level of a file where we enter our resources, we want autocompletion on the available resources */
-class ResourceScope implements ICompletionScope {
-	// The same autocompleteable members might apply after an "include " statement or similar
-
-	getCompletionItems(): CompletionItem[] {
-		throw "Not implemented yet";
-	}
-}
-
-/** When we're inside a resource declaration, and we want autocompletion on the list of possible parameters */
-class ParameterScope implements ICompletionScope {
-
-	getCompletionItems(): CompletionItem[] {
-
-		// this._resource.properties.map(r => {
-		// 	label: r.name,
-		// 	kind: r.type == PuppetType.Enum ? CompletionItemKind.Enum : CompletionItemKind.Property,
-		// 	detail: r.possibleValues // for enums only
-		// });
-
-		throw "Not implemented yet";
-	}
-}
-
-/** The scope when we've entered a parameter, followed by a hash rocket => and want assistance on the available values (in the case of an enum) */
-class ParameterValueScope implements ICompletionScope {
-
-	constructor(private readonly alreadyAssignedParams: IProperty[]) {
-	}
-
-	getCompletionItems(): CompletionItem[] {
-		throw "Not implemented yet";
-	}
-}
 
 
 
