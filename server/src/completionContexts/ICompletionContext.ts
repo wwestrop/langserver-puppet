@@ -1,4 +1,6 @@
-import { CompletionItem } from 'vscode-languageserver-types/lib/main';
+import { PuppetType } from '../types/PuppetType';
+import { IProperty } from '../types/IProperty';
+import { CompletionItem, CompletionItemKind } from 'vscode-languageserver-types/lib/main';
 
 export interface ICompletionContext {
 	getCompletionItems(): CompletionItem[];
@@ -8,7 +10,7 @@ export interface ICompletionContext {
 export class ResourceContext implements ICompletionContext {
 	// The same autocompleteable members might apply after an "include " statement or similar
 
-	getCompletionItems(): CompletionItem[] {
+	public getCompletionItems(): CompletionItem[] {
 		throw "Not implemented yet";
 	}
 }
@@ -16,15 +18,19 @@ export class ResourceContext implements ICompletionContext {
 /** When we're inside a resource declaration, and we want autocompletion on the list of possible parameters */
 export class ParameterContext implements ICompletionContext {
 
-	getCompletionItems(): CompletionItem[] {
+	constructor(private properties: IProperty[]) {
+	}
 
-		// this._resource.properties.map(r => {
-		// 	label: r.name,
-		// 	kind: r.type == PuppetType.Enum ? CompletionItemKind.Enum : CompletionItemKind.Property,
-		// 	detail: r.possibleValues // for enums only
-		// });
+	public getCompletionItems(): CompletionItem[] {
+		var completions = this.properties.map(p => { 
+			return {
+				label: p.name,
+				kind: p.type === PuppetType.Enum ? CompletionItemKind.Enum : CompletionItemKind.Property,
+				detail: p.possibleValues ? p.possibleValues.join(' | ') : undefined, // TODO for enums only, tidy up
+			}
+		});
 
-		throw "Not implemented yet";
+		return completions;
 	}
 }
 
@@ -38,3 +44,10 @@ export class ParameterContext implements ICompletionContext {
 // 		throw "Not implemented yet";
 // 	}
 // }
+
+/** Completion context returned when we have no completion options to offer the user */
+export class NoOpContext implements ICompletionContext {
+	getCompletionItems(): CompletionItem[] {
+		return [];
+	}
+}

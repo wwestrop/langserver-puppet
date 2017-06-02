@@ -76,9 +76,9 @@ connection.onCompletion((textDocumentPosition: TextDocumentPositionParams): Comp
 	if (!relevantDocument) return [];
 
     const index = relevantDocument.offsetAt(textDocumentPosition.position);
-	// const completionContext = ContextResolver.resolve(relevantDocument.getText(), index);
+	const completionContext = new ContextResolver().resolve(relevantDocument.getText(), index);
 
-	// return completionContext.getCompletionItems();
+	return completionContext.getCompletionItems();
 
 	// This is a naive parser, rather than re-parsing on every change, the way it works is basically this:
 	// From the current text entry point, walk back until we see what looks like:
@@ -95,30 +95,7 @@ connection.onCompletion((textDocumentPosition: TextDocumentPositionParams): Comp
 	// The pass parameter contains the position of the text document in 
 	// which code complete got requested. For the example we ignore this
 	// info and always provide the same completion items.
-	return [
-		{
-			label: 'ensure',
-			kind: CompletionItemKind.Enum,
-			documentation: 'present | absent | purged | file | directory | stopped | started',
-			data: null
-		},
-		{
-			label: 'provider',
-			kind: CompletionItemKind.Enum,
-			documentation: 'cmd | powershell | bash | yum | rpm | apt',
-			data: null
-		},
-		{
-			label: 'TypeScript',
-			kind: CompletionItemKind.Text,
-			data: 1
-		},
-		{
-			label: 'JavaScript',
-			kind: CompletionItemKind.Text,
-			data: 2
-		}
-	]
+
 });
 
 

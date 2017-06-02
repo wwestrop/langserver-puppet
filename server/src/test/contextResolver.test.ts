@@ -61,45 +61,55 @@ describe('Resolving the auto-completion context', () => {
 
     describe('When inside a resource declaration', () => {
         it('WHEN WE HAVEN\'T FINISHED THE RESOURCE PREABMLE SO TECHNICALLY ARE NOT IN THE RESOURCE DECLARATION - RE-WORD THE DESCRIBE BLOCK', function() {
-            const manifestContent = `declare myresource {
+            const manifestContent = `class myClass {
                 file { '/var/log/nginx`;
             throw "Test not implemented";
         });
         it('Should list the parameters available for that resource', function() {
-            const manifestContent = `declare myresource {
+            const manifestContent = `class myClass {
                 file { '/var/log/nginx.log': `;
             
-            const result = sut.resolve(manifestContent, 12);
+            const result = sut.resolve(manifestContent, manifestContent.length);
             const w5 = <any>result instanceof ParameterContext;
 
             throw "Test not implemented";
         });
+        it('Is not affected by other resources that are assigned before or after', () => {
+            const manifestContent = `class myClass {
+                file { '/var/log/nginx.log': 
+                    ensure => absent,`;
+                    
+            throw 'Not immpleneted';
+        });
         it('Should not list parameters that have already been set within this resource declaration', function() {
             // TODO this is the one that may require searching forwards from the insertion point
-            const manifestContent = `declare myresource {
+            const manifestContent = `class myClass {
                 file { '/var/log/nginx.log': 
                     ensure => absent,`;
             throw "Test not implemented";
         });
         it('EVEN WITH WHITESPACE!!!!!!!!!!!!!! TODO *********** Should not list parameters that have already been set within this resource declaration', function() {
             // TODO this is the one that may require searching forwards from the insertion point
-            const manifestContent = `declare myresource {
+            const manifestContent = `class myClass {
                 file { '/var/log/nginx.log': 
                     ensure => absent,
                     `;
             throw "Test not implemented";
         });
+        it('Is not affected by other resources declared before or after', () => {
+            throw 'Not immpleneted';
+        });
     });
 
     describe('When assigning a value to a resource paramter (i.e. after the hash rocket =>)', () => {
         it('Should list the available values for an enum-typed param', function() {
-            const manifestContent = `declare myresource {
+            const manifestContent = `class myClass {
                 file { '/var/log/nginx.log': 
                     ensure => `;
             throw "Test not implemented";
         });
         it('Should provide no help for parameters where we cannot know their value in advance, other than their type', function() {
-            const manifestContent = `declare myresource {
+            const manifestContent = `class myClass {
                 file { '/var/log/nginx.log': 
                     mode => `;
             throw "Test not implemented";
