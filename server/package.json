@@ -14,6 +14,7 @@
     "@types/mocha": "^2.2.41",
     "@types/node": "^6.0.52",
     "mocha": "^3.4.2",
+    "pegjs": "^0.10.0",
     "should": "^11.2.1",
     "typescript": "^2.1.5"
   },

@@ -70,16 +70,31 @@ export class ContextResolver {
         // Match all the regexes, then pick the shortest result (as that's the one closeset to the cursor/end-of-line/^) ?????
         // If none match, fall back to the "no completion results available" context 
 
-        var documentUpToCaret = documentText.substring(0, insertionPoint);
+        const documentUpToCaret = documentText.substring(0, insertionPoint);
+        const currentLine = this.getCurrentLine(documentText, insertionPoint);
+
+
+        // Most specific rule first - parameter value completion
+        if(this.currentLineIsAssignment(currentLine)) {
+            // Look back to find out what we're assigning to
+        }
 
 
         const variable = /\$[a-zA-Z0-9]/;
 
         // TODO even the simplest regex is already getting a bit hairy. Maybe a full-blown parser
         // is overkill, perhaps consider a primitive tokeniser, we can inspect the last few tokens to determine the context?
+        // BUT!!!! We may still need to push/pop context as we go, in case assistance requires looking a bit further back than just the current line/documentpart
+
         const classRegex = /class\s+\{\s+['"][a-z][a-z0-9_]*['"]\s*:\s*/;  // <--- list class parameters (That have not already been entered into the manifest)
 
         const resourceParameterContext = /\b([a-z][a-z0-9_]*)\s*\{\s*.+?:\s*?$/;    // TODO linter warning on uppercase (as puppet silently fails)
+
+        // TODO to provide completion on the possible parameter values, I need to know the parameter definition
+        // This lives on the resource
+        // This means I have to look further back to get at these definitions
+        const parameterCompletionContext = /\s*=>\s*/
+        
         var result = resourceParameterContext.exec(documentUpToCaret);
         if(result) {
             const resourceName = result[1];
@@ -97,6 +112,20 @@ export class ContextResolver {
 
         // Discard everything after the insertion point. We use the context leading
         // up to it to determine the contextually-useful options to present the user. 
+    }
+
+    private currentLineIsAssignment(lineText: string): boolean {
+        return lineText.indexOf('=>') !== -1;
+    }
+
+    private getCurrentLine(text: string, currentPosition: number) {
+        let startOfLine = text.lastIndexOf('\n', currentPosition);
+        startOfLine = startOfLine === -1 ? 0 : startOfLine;
+
+        let endOfLine = text.indexOf(text, currentPosition);
+        endOfLine = endOfLine === -1 ? text.length - 1 : endOfLine;
+
+        return text.substring(startOfLine, endOfLine).trim();
     }
 
 }
