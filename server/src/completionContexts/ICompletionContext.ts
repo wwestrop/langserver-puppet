@@ -18,11 +18,13 @@ export class ResourceContext implements ICompletionContext {
 /** When we're inside a resource declaration, and we want autocompletion on the list of possible parameters */
 export class ParameterContext implements ICompletionContext {
 
-	constructor(private properties: IProperty[]) {
+	/** @param allProperties Every property exposed by this resource
+	 */
+	constructor(public readonly allProperties: IProperty[]) {
 	}
 
 	public getCompletionItems(): CompletionItem[] {
-		var completions = this.properties.map(p => { 
+		var completions = this.allProperties.map(p => { 
 			return {
 				label: p.name,
 				kind: p.type === PuppetType.Enum ? CompletionItemKind.Enum : CompletionItemKind.Property,
