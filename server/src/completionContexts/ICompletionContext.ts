@@ -1,3 +1,5 @@
+import { resolve } from 'path';
+import { IResource } from '../types/IResource';
 import { PuppetType } from '../types/PuppetType';
 import { IProperty } from '../types/IProperty';
 import { CompletionItem, CompletionItemKind } from 'vscode-languageserver-types/lib/main';
@@ -20,32 +22,34 @@ export class ParameterContext implements ICompletionContext {
 
 	/** @param allProperties Every property exposed by this resource
 	 */
-	constructor(public readonly allProperties: IProperty[]) {
+	constructor(public readonly resource: IResource) {
+
 	}
 
 	public getCompletionItems(): CompletionItem[] {
-		var completions = this.allProperties.map(p => { 
-			return {
-				label: p.name,
-				kind: p.type === PuppetType.Enum ? CompletionItemKind.Enum : CompletionItemKind.Property,
-				detail: p.possibleValues ? p.possibleValues.join(' | ') : undefined, // TODO for enums only, tidy up
-			}
-		});
+		var completions = this.resource.properties
+			.map(p => { 
+				return {
+					label: p.name,
+					kind: p.type === PuppetType.Enum ? CompletionItemKind.Enum : CompletionItemKind.Property,
+					detail: p.possibleValues ? p.possibleValues.join(' | ') : undefined, // TODO for enums only, tidy up
+				}
+			});
 
 		return completions;
 	}
 }
 
-// /** The Context when we've entered a parameter, followed by a hash rocket => and want assistance on the available values (in the case of an enum) */
-// export class ParameterValueContext implements ICompletionContext {
+/** The Context when we've entered a parameter, followed by a hash rocket => and want assistance on the available values (in the case of an enum) */
+export class ParameterValueContext implements ICompletionContext {
+	
+	constructor(private readonly alreadyAssignedParams: IProperty[]) {
+	}
 
-// 	constructor(private readonly alreadyAssignedParams: IProperty[]) {
-// 	}
-
-// 	getCompletionItems(): CompletionItem[] {
-// 		throw "Not implemented yet";
-// 	}
-// }
+	getCompletionItems(): CompletionItem[] {
+		throw "Not implemented yet";
+	}
+}
 
 /** Completion context returned when we have no completion options to offer the user */
 export class NoOpContext implements ICompletionContext {

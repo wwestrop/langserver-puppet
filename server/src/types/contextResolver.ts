@@ -1,3 +1,4 @@
+import { IResource } from './IResource';
 import { parse } from 'path';
 import { PuppetType } from './PuppetType';
 import { IProperty } from './IProperty';
@@ -7,62 +8,72 @@ import { ICompletionContext, NoOpContext, ParameterContext } from '../completion
  */
 export class ContextResolver {
 
-    private readonly _builtInResourceProperties: Map<string, IProperty[]>;
+    private readonly _builtInResources: IResource[];
 
     constructor() {
         // TODO store this somewhere else, and make it static or something. It's fixed, I don't want to be initialising it all the time
-        this._builtInResourceProperties = new Map<string, IProperty[]>();
-        this._builtInResourceProperties.set('file', [
+        this._builtInResources = [
             {
-                name: 'ensure', 
-                type: PuppetType.Enum,
-                possibleValues: ['present', 'absent', 'file', 'directory']
-            }, 
-            {
-                name: 'content', 
-                type: PuppetType.String,
-                possibleValues: undefined,
+                name: 'package',
+                properties: [
+                    {
+                        name: 'ensure', 
+                        type: PuppetType.Enum,
+                        possibleValues:  ['present', 'absent', 'purged', 'held', 'latest']
+                    }, 
+                    {
+                        name: 'provider', 
+                        type: PuppetType.Enum,
+                        possibleValues: ['apple', 'yum', 'rpm', 'apt', 'windows']
+                    },
+                    {
+                        name: 'install_options', 
+                        type: PuppetType.Array,
+                        possibleValues: undefined
+                    },
+                    {
+                        name: 'source', 
+                        type: PuppetType.String,
+                        possibleValues: undefined
+                    }
+                ]
             },
             {
-                name: 'mode', 
-                type: PuppetType.String,
-                possibleValues: undefined
-            }
-        ]);
-        this._builtInResourceProperties.set('service', [
-            {
-                name: 'ensure', 
-                type: PuppetType.Enum,
-                possibleValues: ['stopped', 'running']
-            }, 
-            {
-                name: 'enable', 
-                type: PuppetType.Enum,
-                possibleValues: ['true', 'false', 'manual', 'mask']
-            }
-        ]);
-        this._builtInResourceProperties.set('package', [
-            {
-                name: 'ensure', 
-                type: PuppetType.Enum,
-                possibleValues:  ['present', 'absent', 'purged', 'held', 'latest']
-            }, 
-            {
-                name: 'provider', 
-                type: PuppetType.Enum,
-                possibleValues: ['apple', 'yum', 'rpm', 'apt', 'windows']
+                name: 'service',
+                properties: [
+                    {
+                        name: 'ensure', 
+                        type: PuppetType.Enum,
+                        possibleValues: ['stopped', 'running']
+                    }, 
+                    {
+                        name: 'enable', 
+                        type: PuppetType.Enum,
+                        possibleValues: ['true', 'false', 'manual', 'mask']
+                    }
+                ]
             },
             {
-                name: 'install_options', 
-                type: PuppetType.Array,
-                possibleValues: undefined
-            },
-            {
-                name: 'source', 
-                type: PuppetType.String,
-                possibleValues: undefined
+                name: 'file',
+                properties: [
+                    {
+                        name: 'ensure', 
+                        type: PuppetType.Enum,
+                        possibleValues: ['present', 'absent', 'file', 'directory']
+                    }, 
+                    {
+                        name: 'content', 
+                        type: PuppetType.String,
+                        possibleValues: undefined,
+                    },
+                    {
+                        name: 'mode', 
+                        type: PuppetType.String,
+                        possibleValues: undefined
+                    }
+                ]
             }
-        ]);
+        ];
     }
 
     public resolve(documentText: string, insertionPoint: number): ICompletionContext {
@@ -100,9 +111,9 @@ export class ContextResolver {
             const resourceName = result[1];
 
             // Look up if it's a built-in type
-            const resourcePropertyInfo = this._builtInResourceProperties.get(resourceName);
-            if(resourcePropertyInfo) {
-                return new ParameterContext(resourcePropertyInfo);
+            const resourceInfo = this._builtInResources.find(r => r.name == resourceName);
+            if(resourceInfo) {
+                return new ParameterContext(resourceInfo);
             }
 
             // If not...... Do something to figure out the auto-complete data for that resource (look up and parse the file, e.g.)
@@ -119,10 +130,10 @@ export class ContextResolver {
     }
 
     private getCurrentLine(text: string, currentPosition: number) {
-        let startOfLine = text.lastIndexOf('\n', currentPosition);
+        let startOfLine = text.lastIndexOf('\n', currentPosition - 1) + 1;
         startOfLine = startOfLine === -1 ? 0 : startOfLine;
 
-        let endOfLine = text.indexOf(text, currentPosition);
+        let endOfLine = text.indexOf('\n', currentPosition);
         endOfLine = endOfLine === -1 ? text.length - 1 : endOfLine;
 
         return text.substring(startOfLine, endOfLine).trim();

@@ -1,4 +1,11 @@
-import { ICompletionContext, ParameterContext, ResourceContext } from '../completionContexts/ICompletionContext';
+import { resolve } from 'dns';
+import {
+    ICompletionContext,
+    NoOpContext,
+    ParameterContext,
+    ParameterValueContext,
+    ResourceContext
+} from '../completionContexts/ICompletionContext';
 import { ContextResolver } from '../types/ContextResolver'
 
 import { assert } from 'chai';
@@ -12,8 +19,11 @@ describe('Resolving the auto-completion context', () => {
         sut = new ContextResolver();
     });
 
-    function act(manifestContent: string, caretPosition?: number): ICompletionContext {
-        caretPosition = caretPosition || manifestContent.length;
+    /** The pipe character, '|' in the input is used to denote the caret position */
+    function act(manifestContent: string): ICompletionContext {
+        const caretPosition = manifestContent.lastIndexOf('|') || manifestContent.length;
+        manifestContent = manifestContent.replace(/\|/g, '');
+
         return sut.resolve(manifestContent, caretPosition)
     }
 
@@ -27,56 +37,104 @@ describe('Resolving the auto-completion context', () => {
     }
 
     describe('When beginning a new manifest', () => {
-        it('Should work with an empty file', () => {
+        it('No completion suggestions available on a completely empty file', () => {
+            // Arrange
             const manifestContent = ``;
-            throw "Test not implemented";
+
+            // Act
+            const result = act(manifestContent);
+
+            // Assert
+            assert.instanceOf(result, NoOpContext);
         });
-        it('Should work with a partially-written resource-definition preamble', () => {
+        it('No completion suggestions available in a partially-written resource-definition preamble', () => {
+            // Arrange
             const manifestContent = `declare myresource`;
-            throw "Test not implemented";
+
+            // Act
+            const result = act(manifestContent);
+
+            // Assert
+            assert.instanceOf(result, NoOpContext);
         });
-        it('Should switch into the next mode after the opening brace', function() {
+        it('Should switch into resource-completion mode after the preamble is finished', function() {
+            // Arrange
             const manifestContent = `declare myresource {`;
-            throw "Test not implemented";
+
+            // Act
+            const result = act(manifestContent);
+
+            // Assert
+            assert.instanceOf(result, ResourceContext);
         });
         it('Should switch into the next mode after the opening brace even if followed by a newline/additional whitespace', function() {
+            // Arrange
             const manifestContent = `declare myresource {
                 \t`;
-            throw "Test not implemented";
+
+            // Act
+            const result = act(manifestContent);
+
+            // Assert
+            assert.instanceOf(result, ResourceContext);
         });
 
         // TODO: DITTO ALL OF THE ABOVE FOR CLASS DEFINITIONS (also goes for parameterised classes)
 
         it('When partway through defining a class\'s (typed) parameters, no autocompletion assistance is available', function() {
+            // Arrange
             const manifestContent = `class myclass (
                 String myParam1,`;
-            throw "Test not implemented";
+
+            // Act
+            const result = act(manifestContent);
+
+            // Assert
+            assert.instanceOf(result, NoOpContext);
         });
         it('When partway through defining a class\'s (untyped) parameters, no autocompletion assistance is available', function() {
+            // Arrange
             const manifestContent = `class myclass (
                 myParam1,`;
-            throw "Test not implemented";
+
+            // Act
+            const result = act(manifestContent);
+
+            // Assert
+            assert.instanceOf(result, NoOpContext);
         });
         it('After defining a parameterised class\'s parameters, then we switch into resource-declaration-mode', function() {
+            // Arrange
             const manifestContent = `class myclass (
                 myParam1,
                 myParam2,
             ){`;
-            throw "Test not implemented";
+            
+            // Act
+            const result = act(manifestContent);
+
+            // Assert
+            assert.instanceOf(result, ResourceContext);
         });
     });
 
     describe('When inside a resource declaration', () => {
-        it('WHEN WE HAVEN\'T FINISHED THE RESOURCE PREABMLE SO TECHNICALLY ARE NOT IN THE RESOURCE DECLARATION - RE-WORD THE DESCRIBE BLOCK', function() {
+        it('Should not provide any autocomplete while still editing the resource preamble', function() {
+            // Arrange
             const manifestContent = `class myClass {
-                file { '/var/log/nginx`;
-            throw "Test not implemented";
+                file { '/var/log/nginx|`;
+
+            // Act
+            const result = act(manifestContent);
+            
+            // Assert
+             assert.instanceOf(result, NoOpContext);
         });
 
         it('Should list the parameters available for that resource (for a built-in Puppet type)', function() {
             // Arrange
             const manifestContent = `class myClass {
-                file { '/var/log/nginx.log': `;
+                file { '/var/log/nginx.log': |`;
 
             // Act
             const result = act(manifestContent);
@@ -91,19 +149,34 @@ describe('Resolving the auto-completion context', () => {
         it('Should list the parameters available for that resource (for a user-written resource)', () => {
             throw "Test not implemented";
         });
-        it('Is not affected by other resources that are assigned before or after', () => {
+        it('Is not affected by other parameters that are assigned before or after', () => {
+            // Arrange
             const manifestContent = `class myClass {
                 file { '/var/log/nginx.log': 
-                    ensure => absent,`;
+                    ensure => absent,
+                    conten|
+                    force => true',`;
 
-            throw 'Not implemented';
+            // Act
+            const result = act(manifestContent);
+
+            // Assert
+            assert.instanceOf(result, ParameterContext);
         });
         it('Should not list parameters that have already been set within this resource declaration', function() {
             // TODO this is the one that may require searching forwards from the insertion point
+            // Arrange
             const manifestContent = `class myClass {
                 file { '/var/log/nginx.log': 
-                    ensure => absent,`;
-            throw "Test not implemented";
+                    ensure => absent,|`;
+            
+            // Act
+            const result = act(manifestContent);
+
+            // Assert
+            assert.instanceOf(result, ParameterContext);
+            const alreadyAssignedParameterInCompletionList = result.getCompletionItems().some(i => i.label == 'ensure');
+            assert.isFalse(alreadyAssignedParameterInCompletionList);
         });
     });
 
@@ -112,19 +185,34 @@ describe('Resolving the auto-completion context', () => {
             const manifestContent = `class myClass {
                 file { '/var/log/nginx.log': 
                     ensure => `;
-            throw "Test not implemented";
+
+            // Act
+            const result = act(manifestContent);
+
+            // Assert
+            assert.instanceOf(result, ParameterValueContext);
+            assertExpectedParameters(result, ['present', 'absent', 'file', 'directory']);
+            throw "Not implemented";
+            
         });
         it('Should provide no help for parameters where we cannot know their value in advance, other than their type', function() {
+            // Arrange
             const manifestContent = `class myClass {
                 file { '/var/log/nginx.log': 
                     mode => `;
-            throw "Test not implemented";
+            
+            // Act
+            const result = act(manifestContent);
+
+            // Assert
+            assert.instanceOf(result, NoOpContext);
         });
     });
 
     describe('When inside a nested block scope (e.g. `if` or `unless`)', () => {
         it('TEST 2', function() {
             // BASICALLY, ALL THE ABOVE TESTS SHOULD STILL WORK
+            
             throw "Test not implemented";
         });
     });
