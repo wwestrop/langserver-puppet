@@ -4,6 +4,36 @@
     let currentProperties = [];
 }
 
+TopLevelContainer =
+	TopLevelContainerType Whitespace Identifier Whitespace OptionalTopLevelArgumentList Whitespace '{' Whitespace ManifestContent Whitespace '}' Whitespace
+
+TopLevelContainerType =
+	'class'
+    / 'resource'
+   
+OptionalTopLevelArgumentList =
+    '(' TopLevelArgumentList ')'
+    / ''
+    
+TopLevelArgumentList =
+    TopLevelArgument Whitespace ',' Whitespace TopLevelArgumentList
+    / TopLevelArgument
+
+TopLevelArgument =
+	Identifier Whitespace Identifier
+    / Identifier
+
+ManifestContent = 
+	Declaration Whitespace DeclarationConnector Whitespace ManifestContent
+    / Declaration
+
+DeclarationConnector =
+	'->'
+    / '~>'
+    / '<-'
+    / '<~'
+    / ''
+
 Declaration =
 	DeclarationPreamble Whitespace DeclarationBody Whitespace DeclarationEnd
 

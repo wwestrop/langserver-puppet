@@ -3,6 +3,8 @@ import { parse } from 'path';
 import { PuppetType } from './PuppetType';
 import { IProperty } from './IProperty';
 import { ICompletionContext, NoOpContext, ParameterContext } from '../completionContexts/ICompletionContext';
+//import * as Parser from '../../myparser';
+
 /** Resolves the 'context' in which an autocompletion is being requested.
  *  This means, different options will be surfaced depending what the user is doing at that point. 
  */
@@ -118,6 +120,40 @@ export class ContextResolver {
 
             // If not...... Do something to figure out the auto-complete data for that resource (look up and parse the file, e.g.)
         }
+
+        // try {
+        //     Parser.parse(documentUpToCaret);
+        // }
+        // catch (SyntaxError) {
+        //     // Don't care. While the user is in the middle of making modifications, it's entirely likely that the file
+        //     // will not be in a fully parseable state. However, as it does the parse, it still provides useful bits of context
+        // }
+
+        // if (!Parser.currentResource) {
+        //     // resource completion mode
+        //     // may also be no-op mode, as maybe e.g. we haven't finished the preamble
+        // }
+        // else if (Parser.currentResource && !Parser.currentProperty) {
+        //     // Parameter list mode
+        // }
+        // else if (Parser.currentResource && Parser.currentProperty) {
+        //     // Parameter completion mode (for enums)
+            
+        //     // Look up the type information about the parameter being entered
+        //     const resInfo = this._builtInResources
+        //         .find(r => r.name == Parser.currentResource);
+        //     if(!resInfo) throw "oh noes";
+        //     const parmInfo = resInfo.properties.find(p => p.name == Parser.currentProperty);
+        //     if(!parmInfo) throw "oh noes";
+
+        //     if (parmInfo.type === PuppetType.Enum) {
+        //         // Provide assistance
+        //     }
+        //     else {
+        //         return new NoOpContext();
+        //     }
+        // }
+        
 
         return new NoOpContext();
 

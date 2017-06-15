@@ -21,7 +21,10 @@ describe('Resolving the auto-completion context', () => {
 
     /** The pipe character, '|' in the input is used to denote the caret position */
     function act(manifestContent: string): ICompletionContext {
-        const caretPosition = manifestContent.lastIndexOf('|') || manifestContent.length;
+        let caretPosition = manifestContent.lastIndexOf('|');
+        if (caretPosition === -1) {
+            caretPosition = manifestContent.length;
+        }
         manifestContent = manifestContent.replace(/\|/g, '');
 
         return sut.resolve(manifestContent, caretPosition)
@@ -184,7 +187,7 @@ describe('Resolving the auto-completion context', () => {
         it('Should list the available values for an enum-typed param', function() {
             const manifestContent = `class myClass {
                 file { '/var/log/nginx.log': 
-                    ensure => `;
+                    ensure => |`;
 
             // Act
             const result = act(manifestContent);
@@ -199,7 +202,7 @@ describe('Resolving the auto-completion context', () => {
             // Arrange
             const manifestContent = `class myClass {
                 file { '/var/log/nginx.log': 
-                    mode => `;
+                    mode => |`;
             
             // Act
             const result = act(manifestContent);
