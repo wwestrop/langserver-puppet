@@ -23,6 +23,6 @@
     "parser": "node ./node_modules/pegjs/bin/pegjs -o myparser.js src/parser/grammar.pegjs",
     "compile": "installServerIntoExtension ../client ./package.json ./tsconfig.json && tsc -p .",
     "watch": "installServerIntoExtension ../client ./package.json ./tsconfig.json && tsc --watch -p .",
-    "test": "tsc & mocha ../client/server/test/**/*.js"
+    "test": "tsc -p . & mocha ../client/server/test/**/*.js"
   }
 }

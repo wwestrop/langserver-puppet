@@ -5,8 +5,8 @@ import {
     ParameterContext,
     ParameterValueContext,
     ResourceContext
-} from '../completionContexts/ICompletionContext';
-import { ContextResolver } from '../types/ContextResolver'
+} from '../src/completionContexts/ICompletionContext';
+import { ContextResolver } from '../src/types/ContextResolver'
 
 import { assert } from 'chai';
 import 'mocha';
