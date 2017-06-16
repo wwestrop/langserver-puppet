@@ -99,9 +99,9 @@ export class ContextResolver {
         // is overkill, perhaps consider a primitive tokeniser, we can inspect the last few tokens to determine the context?
         // BUT!!!! We may still need to push/pop context as we go, in case assistance requires looking a bit further back than just the current line/documentpart
 
-        const classRegex = /class\s+\{\s+['"][a-z][a-z0-9_]*['"]\s*:\s*/;  // <--- list class parameters (That have not already been entered into the manifest)
+        const classRegex = /class\s+\{\s+['"][a-z][a-zA-Z0-9_]*['"]\s*:\s*/;  // <--- list class parameters (That have not already been entered into the manifest)
 
-        const resourceParameterContext = /\b([a-z][a-z0-9_]*)\s*\{\s*.+?:\s*?$/;    // TODO linter warning on uppercase (as puppet silently fails)
+        const resourceParameterContext = /\b([a-z][a-zA-Z0-9_]*)\s*\{\s*["'].+?['"]:\s*?/;    // TODO linter warning on uppercase (as puppet silently fails)
 
         // TODO to provide completion on the possible parameter values, I need to know the parameter definition
         // This lives on the resource

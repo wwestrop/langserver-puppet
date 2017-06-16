@@ -166,6 +166,20 @@ describe('Resolving the auto-completion context', () => {
             // Assert
             assert.instanceOf(result, ParameterContext);
         });
+        it('Should list parameters when inserting into a closed-off declaration', () => {
+            // Arrange
+            const manifestContent = `class myClass {
+                file { '/var/log/nginx.log': 
+                    ensure => absent,
+                    conten|
+                }`;
+
+            // Act
+            const result = act(manifestContent);
+
+            // Assert
+            assert.instanceOf(result, ParameterContext);
+        });
         it('Should not list parameters that have already been set within this resource declaration', function() {
             // TODO this is the one that may require searching forwards from the insertion point
             // Arrange
