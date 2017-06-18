@@ -195,6 +195,18 @@ describe('Resolving the auto-completion context', () => {
             const alreadyAssignedParameterInCompletionList = result.getCompletionItems().some(i => i.label == 'ensure');
             assert.isFalse(alreadyAssignedParameterInCompletionList);
         });
+        it('Should suggest no completions within an unknown resource', () => {
+            // Arrange
+            const manifestContent = `class myClass {
+                gobblydegookResource { '/var/log/nginx.log': 
+                    ensure => absent,|`;
+            
+            // Act
+            const result = act(manifestContent);
+
+            // Assert
+            assert.instanceOf(result, NoOpContext);
+        });
     });
 
     describe('When assigning a value to a resource parameter (i.e. after the hash rocket =>)', () => {
