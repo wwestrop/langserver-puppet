@@ -103,6 +103,19 @@ describe('Resolving the auto-completion context', () => {
             // Assert
             assert.instanceOf(result, ResourceContext);
         });
+        it.skip('Should narrow the suggested resources based upon what has already been typed', () => {
+            // Arrange
+            const manifestContent = `class myclass { 
+                \t service {'sshd':
+                    \t en|`;
+            
+            // Act
+            const result = act(manifestContent);
+
+            // Assert
+            assert.instanceOf(result, ResourceContext);
+            assertExpectedParameters(result, ['enabled', 'ensure']);
+        });
     });
 
     describe('When inside a resource declaration', () => {
