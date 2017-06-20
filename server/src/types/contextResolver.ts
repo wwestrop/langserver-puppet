@@ -98,8 +98,7 @@ export class ContextResolver {
         // Most specific "context mode" first
         if (parseOutput.currentProperty) {
             // Look up the type information about the parameter being entered
-            const resInfo = this._builtInResources
-                .find(r => r.name == Parser.currentResource);
+            const resInfo = this.findTypeInfo(Parser.currentResource);
             if(!resInfo) throw "oh noes";
             const parmInfo = resInfo.properties.find(p => p.name == Parser.currentProperty);
             if(!parmInfo) throw "oh noes";
@@ -114,8 +113,7 @@ export class ContextResolver {
         }
         else if (parseOutput.currentResource) {
             // Look up the type information about the parameters available on this resource
-            const resInfo = this._builtInResources
-                .find(r => r.name == parseOutput.currentResource);
+            const resInfo = this.findTypeInfo(Parser.currentResource);
             if(!resInfo) throw "oh noes";
 
             return new ParameterContext(resInfo);
@@ -126,5 +124,24 @@ export class ContextResolver {
         else {
             return new NoOpContext();
         }
+    }
+
+    private findTypeInfo(resourceName: string): IResource | null {
+
+        // Search the Puppet built-in types
+        const typeInfo = this._builtInResources.find(r => r.name === resourceName);
+        if(typeInfo) {
+            return typeInfo;
+        }
+
+        // TODO: Search....
+        //         The current directory/tree?
+        //         Some user-configured module path?
+        //         An R10K file?
+        //         Puppet Forge?
+        //         Some other module repository?
+
+        // No matching resource found
+        return null;
     }
 }

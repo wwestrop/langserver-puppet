@@ -3,4 +3,5 @@ export class ParseResult {
 	public readonly currentResource: string | null = null;
 	public readonly currentProperty: string | null = null;
     public readonly currentProperties: string[] = [];
+    public readonly mode: string | null = null;
 }

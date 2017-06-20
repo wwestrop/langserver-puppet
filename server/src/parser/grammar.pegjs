@@ -3,6 +3,7 @@
 	options.currentResource = null;
 	options.currentProperty = null;
     options.currentProperties = [];
+    options.mode = 'null';
 }
 
 TopLevelContainer =
@@ -15,12 +16,16 @@ TopLevelContainerType =
 TopLevelContainerStart = 
 	containerType:TopLevelContainerType Whitespace id:Identifier Whitespace OptionalTopLevelArgumentList Whitespace '{'
 	{
+        options.mode = 'resource';
+        console.log(options.mode);
         options.currentContainer = id;
     	console.debug('>> Begin top level container (' + containerType + ' : ' + id + ')');
     }
 TopLevelContainerEnd =
 	'}'
     {
+        options.mode = 'null';
+        console.log(options.mode);
         options.currentContainer = null;
     	console.debug('<< End top level container');
     }
@@ -50,13 +55,28 @@ DeclarationConnector =
 
 Declaration =
 	DeclarationPreamble Whitespace DeclarationBody Whitespace DeclarationEnd
+    {
+        options.mode = 'resource';
+        console.log(options.mode);
+    }
 
 DeclarationPreamble =
-	type:Identifier Whitespace '{' Whitespace title:Title Whitespace
+	type:Identifier DelcarationNameEnd Whitespace title:Title
     {
     	options.currentResource = type === 'class' ? title : type;
         console.debug('saw declaration for ' + options.currentResource);
+
+        options.mode = 'parameter';
+        console.log(options.mode);
+
         return options.currentResource;
+    }
+
+DelcarationNameEnd = 
+    Whitespace '{' // TODO: I would *like* for resource-completion mode to end as soon as the whitespace is typed, but that can be zero length. I've tried making a mandatory variant, but am having no luck. A tokenizer wouldn't help in this scenario either.
+    {
+        options.mode = 'null';
+        console.log(options.mode);
     }
     
 DeclarationBody =
@@ -79,6 +99,8 @@ PropertyAssignmentPreamble =
 	parameter:Identifier Whitespace '=>'
     {
     	options.currentProperty = parameter;
+        options.mode = 'propertyValue';
+        console.log(options.mode);
     	console.debug('in context of parameter ' + parameter);
         return parameter;
     }
@@ -116,7 +138,7 @@ Expr =
 	FuncExpr /
 	StringExpr /
     Identifier
-    // Hash expression
+    // TODO: Hash expression
 
 FuncExpr =
 	Identifier Whitespace '(' Whitespace FuncParamList Whitespace ')'
