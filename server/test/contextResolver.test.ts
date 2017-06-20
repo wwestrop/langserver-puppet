@@ -116,6 +116,17 @@ describe('Resolving the auto-completion context', () => {
             assert.instanceOf(result, ResourceContext);
             assertExpectedParameters(result, ['enabled', 'ensure']);
         });
+        it.skip('Immediately after the resource type is finalised, should stop providing this assistance', () => {
+            // Arrange
+            const manifestContent = `class myclass { 
+                \t service {`;
+            
+            // Act
+            const result = act(manifestContent);
+
+            // Assert
+            assert.instanceOf(result, NoOpContext);
+        });
     });
 
     describe('When inside a resource declaration', () => {
