@@ -1,15 +1,29 @@
 {
-	let currentResource = null;
-	let currentProperty = null;
-    let currentProperties = [];
+    options.currentContainer = null;
+	options.currentResource = null;
+	options.currentProperty = null;
+    options.currentProperties = [];
 }
 
 TopLevelContainer =
-	TopLevelContainerType Whitespace Identifier Whitespace OptionalTopLevelArgumentList Whitespace '{' Whitespace ManifestContent Whitespace '}' Whitespace
+	TopLevelContainerStart Whitespace ManifestContent Whitespace TopLevelContainerEnd Whitespace
 
 TopLevelContainerType =
 	'class'
     / 'resource'
+
+TopLevelContainerStart = 
+	containerType:TopLevelContainerType Whitespace id:Identifier Whitespace OptionalTopLevelArgumentList Whitespace '{'
+	{
+        options.currentContainer = id;
+    	console.log('>> Begin top level container (' + containerType + ' : ' + id + ')');
+    }
+TopLevelContainerEnd =
+	'}'
+    {
+        options.currentContainer = null;
+    	console.log('<< End top level container');
+    }
    
 OptionalTopLevelArgumentList =
     '(' TopLevelArgumentList ')'
@@ -40,9 +54,9 @@ Declaration =
 DeclarationPreamble =
 	type:Identifier Whitespace '{' Whitespace title:Title Whitespace
     {
-    	currentResource = {type: type, title: title};
-        console.log('saw declaration for ' + currentResource.type + ' / ' + currentResource.title);
-        return currentResource;
+    	options.currentResource = type === 'class' ? title : type;
+        console.log('saw declaration for ' + options.currentResource);
+        return options.currentResource;
     }
     
 DeclarationBody =
@@ -57,15 +71,14 @@ PropertyAssignment =
 	parameter:PropertyAssignmentPreamble Whitespace value:PropertyAssignmentValue
     {
         let assignment = { parameter: parameter, value: value };
-		console.log('returned assignement ' + parameter + ' <- ' + value);
-        currentProperties.push(assignment);
+        options.currentProperties.push(assignment);
         return assignment;
     }
     
 PropertyAssignmentPreamble =
 	parameter:Identifier Whitespace '=>'
     {
-    	currentProperty = parameter;
+    	options.currentProperty = parameter;
     	console.log('in context of parameter ' + parameter);
         return parameter;
     }
@@ -73,17 +86,17 @@ PropertyAssignmentPreamble =
 PropertyAssignmentValue =
 	value:Expr
     {
-    	console.log('assigning value of ' + value + ' (ends parameter context of ' + currentProperty + ')');
-        currentProperty = null;
+    	console.log('assigning value of ' + value + ' (ends parameter context of ' + options.currentProperty + ')');
+        options.currentProperty = null;
     	return value;
     }
     
 DeclarationEnd = 
 	'}'
     {
-    	console.log('ending declaration for ' + currentResource.type + ' / ' + currentResource.title);
-    	currentResource = null;
-        currentProperties = [];
+    	console.log('ending declaration for ' + options.currentResource);
+    	options.currentResource = null;
+        options.currentProperties = [];
     }
 
 Identifier =
