@@ -16,13 +16,13 @@ TopLevelContainerStart =
 	containerType:TopLevelContainerType Whitespace id:Identifier Whitespace OptionalTopLevelArgumentList Whitespace '{'
 	{
         options.currentContainer = id;
-    	console.log('>> Begin top level container (' + containerType + ' : ' + id + ')');
+    	console.debug('>> Begin top level container (' + containerType + ' : ' + id + ')');
     }
 TopLevelContainerEnd =
 	'}'
     {
         options.currentContainer = null;
-    	console.log('<< End top level container');
+    	console.debug('<< End top level container');
     }
    
 OptionalTopLevelArgumentList =
@@ -55,7 +55,7 @@ DeclarationPreamble =
 	type:Identifier Whitespace '{' Whitespace title:Title Whitespace
     {
     	options.currentResource = type === 'class' ? title : type;
-        console.log('saw declaration for ' + options.currentResource);
+        console.debug('saw declaration for ' + options.currentResource);
         return options.currentResource;
     }
     
@@ -79,14 +79,14 @@ PropertyAssignmentPreamble =
 	parameter:Identifier Whitespace '=>'
     {
     	options.currentProperty = parameter;
-    	console.log('in context of parameter ' + parameter);
+    	console.debug('in context of parameter ' + parameter);
         return parameter;
     }
 
 PropertyAssignmentValue =
 	value:Expr
     {
-    	console.log('assigning value of ' + value + ' (ends parameter context of ' + options.currentProperty + ')');
+    	console.debug('assigning value of ' + value + ' (ends parameter context of ' + options.currentProperty + ')');
         options.currentProperty = null;
     	return value;
     }
@@ -94,9 +94,10 @@ PropertyAssignmentValue =
 DeclarationEnd = 
 	'}'
     {
-    	console.log('ending declaration for ' + options.currentResource);
+    	console.debug('ending declaration for ' + options.currentResource);
     	options.currentResource = null;
         options.currentProperties = [];
+        options.currentProperty = null;
     }
 
 Identifier =

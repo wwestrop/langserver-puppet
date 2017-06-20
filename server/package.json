@@ -20,9 +20,9 @@
     "typescript": "^2.1.5"
   },
   "scripts": {
-    "parser": "node ./node_modules/pegjs/bin/pegjs -o myparser.js src/parser/grammar.pegjs",
-    "compile": "installServerIntoExtension ../client ./package.json ./tsconfig.json && tsc -p .",
+    "parser": "node ./node_modules/pegjs/bin/pegjs -o ./src/parser/parser.js ./src/parser/grammar.pegjs",
+    "compile": "installServerIntoExtension ../client ./package.json ./tsconfig.json && tsc -p . & npm run parser",
     "watch": "installServerIntoExtension ../client ./package.json ./tsconfig.json && tsc --watch -p .",
-    "test": "tsc -p . & mocha ../client/server/test/**/*.js"
+    "test": "npm run compile & mocha ../client/server/test/**/*.js"
   }
 }

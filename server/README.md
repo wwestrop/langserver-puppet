@@ -12,6 +12,12 @@ The VS Code marketplace already has an extension for Puppet language support whi
   * For custom types, independent parsing of the file containing that type will need to be implemented to provide completion. 
   * Support for in-built resources is hardcoded and thus does not reflect any updates made in later Puppet releases. 
 
+# Known limitations
+Ideally, these would need to be resolved before tackling any extra features from the TODO list. 
+* Comments are not supported :eek:
+* Hashes are not supported
+* If/Unless blocks are not handled
+
 # TODO
 * Completion for include-like statements, e.g. "`include filebeat`", "`require nginx`"
 * Completion for class pseudo-resource (resource-style class declaration) 
