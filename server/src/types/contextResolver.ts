@@ -1,3 +1,4 @@
+import { ParseResult } from '../parser/parseResult';
 import { IResource } from './IResource';
 import { PuppetType } from './PuppetType';
 import {
@@ -23,22 +24,22 @@ export class ContextResolver {
                 properties: [
                     {
                         name: 'ensure', 
-                        type: PuppetType.Enum,
+                        type: 'Enum',
                         possibleValues:  ['present', 'absent', 'purged', 'held', 'latest']
                     }, 
                     {
                         name: 'provider', 
-                        type: PuppetType.Enum,
+                        type: 'Enum',
                         possibleValues: ['apple', 'yum', 'rpm', 'apt', 'windows']
                     },
                     {
                         name: 'install_options', 
-                        type: PuppetType.Array,
+                        type: 'Array',
                         possibleValues: undefined
                     },
                     {
                         name: 'source', 
-                        type: PuppetType.String,
+                        type: 'String',
                         possibleValues: undefined
                     }
                 ]
@@ -48,12 +49,12 @@ export class ContextResolver {
                 properties: [
                     {
                         name: 'ensure', 
-                        type: PuppetType.Enum,
+                        type: 'Enum',
                         possibleValues: ['stopped', 'running']
                     }, 
                     {
                         name: 'enable', 
-                        type: PuppetType.Enum,
+                        type: 'Enum',
                         possibleValues: ['true', 'false', 'manual', 'mask']
                     }
                 ]
@@ -63,17 +64,17 @@ export class ContextResolver {
                 properties: [
                     {
                         name: 'ensure', 
-                        type: PuppetType.Enum,
+                        type: 'Enum',
                         possibleValues: ['present', 'absent', 'file', 'directory']
                     }, 
                     {
                         name: 'content', 
-                        type: PuppetType.String,
+                        type: 'String',
                         possibleValues: undefined,
                     },
                     {
                         name: 'mode', 
-                        type: PuppetType.String,
+                        type: 'String',
                         possibleValues: undefined
                     }
                 ]
@@ -85,45 +86,51 @@ export class ContextResolver {
 
         const documentUpToCaret = documentText.substring(0, insertionPoint);
 
-        const parseOutput: any = {};
+        const parseOutput = new ParseResult();
         try {
             Parser.parse(documentUpToCaret, parseOutput);
         }
-        catch (SyntaxError) {
-            // Don't care. While the user is in the middle of making modifications, 
-            // it's entirely likely that the file will not be in a fully parseable state.
-            // However, as the file is being parsed, it still outputs useful bits of context.
+        catch (e) {
+            if (e instanceof Parser.SyntaxError) {
+                // Don't care. While the user is in the middle of making modifications, 
+                // it's entirely likely that the file will not be in a fully parseable state.
+                // However, as the file is being parsed, it still outputs useful bits of context.
+            }
+            else {
+                // Parser error
+                throw e;
+            }
         }
 
         // Most specific "context mode" first
-        if (parseOutput.currentProperty) {
+        if (parseOutput.mode === 'parameterValue') {
             // Look up the type information about the parameter being entered
-            const resInfo = this.findTypeInfo(Parser.currentResource);
-            if(!resInfo) throw "oh noes";
-            const parmInfo = resInfo.properties.find(p => p.name == Parser.currentProperty);
-            if(!parmInfo) throw "oh noes";
 
-            if (parmInfo.type === PuppetType.Enum) {
-                // Provide assistance
-                throw "Not implemented";
-            }
-            else {
-                return new NoOpContext();
+            if(!parseOutput.currentResource) throw "This scenario shouldn't arise";
+            const resInfo = this.findTypeInfo(parseOutput.currentResource);
+
+            if (resInfo) {
+                const parmInfo = resInfo.properties.find(p => p.name == parseOutput.currentProperty);
+                if (parmInfo && parmInfo.type === 'Enum') {
+                    // Provide assistance
+                    throw "Not implemented";
+                }
             }
         }
-        else if (parseOutput.currentResource) {
+        else if (parseOutput.mode === 'parameter') {
             // Look up the type information about the parameters available on this resource
-            const resInfo = this.findTypeInfo(Parser.currentResource);
-            if(!resInfo) throw "oh noes";
+            if(!parseOutput.currentResource) throw "This scenario shouldn't arise";
+            const resInfo = this.findTypeInfo(parseOutput.currentResource);
 
-            return new ParameterContext(resInfo);
+            if(resInfo) {
+                return new ParameterContext(resInfo);
+            }
         }
-        else if (parseOutput.currentContainer) {
+        else if (parseOutput.mode === 'resource') {
             return new ResourceContext();
         }
-        else {
-            return new NoOpContext();
-        }
+
+        return new NoOpContext();
     }
 
     private findTypeInfo(resourceName: string): IResource | null {

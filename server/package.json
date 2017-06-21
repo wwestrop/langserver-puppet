@@ -21,7 +21,7 @@
   },
   "scripts": {
     "parser": "node ./node_modules/pegjs/bin/pegjs -o ./src/parser/parser.js ./src/parser/grammar.pegjs",
-    "compile": "installServerIntoExtension ../client ./package.json ./tsconfig.json && tsc -p . & npm run parser",
+    "compile": "npm run parser && tsc -p . && installServerIntoExtension ../client ./package.json ./tsconfig.json",
     "watch": "installServerIntoExtension ../client ./package.json ./tsconfig.json && tsc --watch -p .",
     "test": "npm run compile & mocha ../client/server/test/**/*.js"
   }

@@ -17,17 +17,17 @@ TopLevelContainerStart =
 	containerType:TopLevelContainerType Whitespace id:Identifier Whitespace OptionalTopLevelArgumentList Whitespace '{'
 	{
         options.mode = 'resource';
-        console.log(options.mode);
+        // console.log(options.mode);
         options.currentContainer = id;
-    	console.debug('>> Begin top level container (' + containerType + ' : ' + id + ')');
+    	// console.debug('>> Begin top level container (' + containerType + ' : ' + id + ')');
     }
 TopLevelContainerEnd =
 	'}'
     {
         options.mode = 'null';
-        console.log(options.mode);
+        // console.log(options.mode);
         options.currentContainer = null;
-    	console.debug('<< End top level container');
+    	// console.debug('<< End top level container');
     }
    
 OptionalTopLevelArgumentList =
@@ -57,17 +57,17 @@ Declaration =
 	DeclarationPreamble Whitespace DeclarationBody Whitespace DeclarationEnd
     {
         options.mode = 'resource';
-        console.log(options.mode);
+        // console.log(options.mode);
     }
 
 DeclarationPreamble =
 	type:Identifier DelcarationNameEnd Whitespace title:Title
     {
     	options.currentResource = type === 'class' ? title : type;
-        console.debug('saw declaration for ' + options.currentResource);
+        // console.debug('saw declaration for ' + options.currentResource);
 
         options.mode = 'parameter';
-        console.log(options.mode);
+        // console.log(options.mode);
 
         return options.currentResource;
     }
@@ -76,7 +76,7 @@ DelcarationNameEnd =
     Whitespace '{' // TODO: I would *like* for resource-completion mode to end as soon as the whitespace is typed, but that can be zero length. I've tried making a mandatory variant, but am having no luck. A tokenizer wouldn't help in this scenario either.
     {
         options.mode = 'null';
-        console.log(options.mode);
+        // console.log(options.mode);
     }
     
 DeclarationBody =
@@ -100,15 +100,15 @@ PropertyAssignmentPreamble =
     {
     	options.currentProperty = parameter;
         options.mode = 'propertyValue';
-        console.log(options.mode);
-    	console.debug('in context of parameter ' + parameter);
+        // console.log(options.mode);
+    	// console.debug('in context of parameter ' + parameter);
         return parameter;
     }
 
 PropertyAssignmentValue =
 	value:Expr
     {
-    	console.debug('assigning value of ' + value + ' (ends parameter context of ' + options.currentProperty + ')');
+    	// console.debug('assigning value of ' + value + ' (ends parameter context of ' + options.currentProperty + ')');
         options.currentProperty = null;
     	return value;
     }
@@ -116,7 +116,7 @@ PropertyAssignmentValue =
 DeclarationEnd = 
 	'}'
     {
-    	console.debug('ending declaration for ' + options.currentResource);
+    	// console.debug('ending declaration for ' + options.currentResource);
     	options.currentResource = null;
         options.currentProperties = [];
         options.currentProperty = null;

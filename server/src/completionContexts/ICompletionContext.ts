@@ -31,7 +31,7 @@ export class ParameterContext implements ICompletionContext {
 			.map(p => { 
 				return {
 					label: p.name,
-					kind: p.type === PuppetType.Enum ? CompletionItemKind.Enum : CompletionItemKind.Property,
+					kind: p.type === 'Enum' ? CompletionItemKind.Enum : CompletionItemKind.Property,
 					detail: p.possibleValues ? p.possibleValues.join(' | ') : undefined, // TODO for enums only, tidy up
 				}
 			});
