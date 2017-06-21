@@ -1,6 +1,7 @@
+import BuiltInResources from '../consts/builtInResources';
 import { resolve } from 'path';
 import { IResource } from '../types/IResource';
-import { PuppetType } from '../types/PuppetType';
+import { PuppetType } from '../types/puppetType';
 import { IProperty } from '../types/IProperty';
 import { CompletionItem, CompletionItemKind } from 'vscode-languageserver-types/lib/main';
 
@@ -13,7 +14,16 @@ export class ResourceContext implements ICompletionContext {
 	// The same autocompleteable members might apply after an "include " statement or similar
 
 	public getCompletionItems(): CompletionItem[] {
-		throw "Not implemented yet";
+
+		var completions = BuiltInResources
+			.map(p => { 
+				return {
+					label: p.name,
+					kind: CompletionItemKind.Class,
+				}
+			});
+
+		return completions;
 	}
 }
 

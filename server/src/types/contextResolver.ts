@@ -1,6 +1,6 @@
 import { ParseResult } from '../parser/parseResult';
 import { IResource } from './IResource';
-import { PuppetType } from './PuppetType';
+import { PuppetType } from './puppetType';
 import {
     ICompletionContext,
     NoOpContext,
@@ -9,79 +9,12 @@ import {
     ResourceContext
 } from '../completionContexts/ICompletionContext';
 import * as Parser from '../parser/parser';
+import BuiltInResources from '../consts/builtInResources'
 
 /** Resolves the 'context' in which an autocompletion is being requested.
  *  This means, different options will be surfaced depending what the user is doing at that point. 
  */
 export class ContextResolver {
-
-    private readonly _builtInResources: IResource[];
-
-    constructor() {
-        // TODO store this somewhere else, and make it static or something. It's fixed, I don't want to be initialising it all the time
-        this._builtInResources = [
-            {
-                name: 'package',
-                properties: [
-                    {
-                        name: 'ensure', 
-                        type: 'Enum',
-                        possibleValues:  ['present', 'absent', 'purged', 'held', 'latest']
-                    }, 
-                    {
-                        name: 'provider', 
-                        type: 'Enum',
-                        possibleValues: ['apple', 'yum', 'rpm', 'apt', 'windows']
-                    },
-                    {
-                        name: 'install_options', 
-                        type: 'Array',
-                        possibleValues: undefined
-                    },
-                    {
-                        name: 'source', 
-                        type: 'String',
-                        possibleValues: undefined
-                    }
-                ]
-            },
-            {
-                name: 'service',
-                properties: [
-                    {
-                        name: 'ensure', 
-                        type: 'Enum',
-                        possibleValues: ['stopped', 'running']
-                    }, 
-                    {
-                        name: 'enable', 
-                        type: 'Enum',
-                        possibleValues: ['true', 'false', 'manual', 'mask']
-                    }
-                ]
-            },
-            {
-                name: 'file',
-                properties: [
-                    {
-                        name: 'ensure', 
-                        type: 'Enum',
-                        possibleValues: ['present', 'absent', 'file', 'directory']
-                    }, 
-                    {
-                        name: 'content', 
-                        type: 'String',
-                        possibleValues: undefined,
-                    },
-                    {
-                        name: 'mode', 
-                        type: 'String',
-                        possibleValues: undefined
-                    }
-                ]
-            }
-        ];
-    }
 
     public resolve(documentText: string, insertionPoint: number): ICompletionContext {
 
@@ -138,7 +71,7 @@ export class ContextResolver {
     private findTypeInfo(resourceName: string): IResource | null {
 
         // Search the Puppet built-in types
-        const typeInfo = this._builtInResources.find(r => r.name === resourceName);
+        const typeInfo = BuiltInResources.find(r => r.name === resourceName);
         if(typeInfo) {
             return typeInfo;
         }

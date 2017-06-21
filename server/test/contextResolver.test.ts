@@ -241,5 +241,19 @@ describe('Resolving the auto-completion context', () => {
             // Assert
             assert.instanceOf(result, NoOpContext);
         });
+        it('Should revert to parameter-completion mode once we\'ve assigned a value', function() {
+            // Arrange
+            const manifestContent = `class myClass {
+                file { '/var/log/nginx.log': 
+                    mode => '0777',|`;
+            
+            // Act
+            const result = act(manifestContent);
+
+            // Assert
+            assert.instanceOf(result, ParameterContext);
+            // TODO - should probably test here that the ParmeterContext is for the proper resource,
+            // but that detail is not exposed by the method we're using here, would have to adapt it. 
+        });
     });
 });
