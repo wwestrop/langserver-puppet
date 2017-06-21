@@ -5,6 +5,7 @@ import {
     ICompletionContext,
     NoOpContext,
     ParameterContext,
+    ParameterValueContext,
     ResourceContext
 } from '../completionContexts/ICompletionContext';
 import * as Parser from '../parser/parser';
@@ -103,7 +104,7 @@ export class ContextResolver {
         }
 
         // Most specific "context mode" first
-        if (parseOutput.mode === 'parameterValue') {
+        if (parseOutput.mode === 'propertyValue') {
             // Look up the type information about the parameter being entered
 
             if(!parseOutput.currentResource) throw "This scenario shouldn't arise";
@@ -113,7 +114,8 @@ export class ContextResolver {
                 const parmInfo = resInfo.properties.find(p => p.name == parseOutput.currentProperty);
                 if (parmInfo && parmInfo.type === 'Enum') {
                     // Provide assistance
-                    throw "Not implemented";
+                    if (!parmInfo.possibleValues) throw "This scenario should not arise";
+                    return new ParameterValueContext(parmInfo.possibleValues);
                 }
             }
         }

@@ -40,14 +40,23 @@ export class ParameterContext implements ICompletionContext {
 	}
 }
 
-/** The Context when we've entered a parameter, followed by a hash rocket => and want assistance on the available values (in the case of an enum) */
+/** The Context when we've entered a parameter, followed by a hash rocket => and want assistance 
+ *  on the available values (in the case of an enum) */
 export class ParameterValueContext implements ICompletionContext {
 	
-	constructor(private readonly alreadyAssignedParams: IProperty[]) {
+	constructor(private readonly possibleValues: string[]) {
 	}
 
 	getCompletionItems(): CompletionItem[] {
-		throw "Not implemented yet";
+		var completions = this.possibleValues
+			.map(p => { 
+				return {
+					label: p,
+					kind: CompletionItemKind.Enum
+				}
+			});
+
+		return completions;
 	}
 }
 

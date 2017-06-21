@@ -227,8 +227,7 @@ describe('Resolving the auto-completion context', () => {
 
             // Assert
             assert.instanceOf(result, ParameterValueContext);
-            assertExpectedParameters(result, ['present', 'absent', 'file', 'directory']);
-            
+            assertExpectedParameters(result, ['present', 'absent', 'file', 'directory']);            
         });
         it('Should not attempt to provide completion for parameters that can take any value', function() {
             // Arrange

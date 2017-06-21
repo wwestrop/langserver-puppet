@@ -6,4 +6,4 @@ export class ParseResult {
     public readonly mode: CompletionMode | null = null;
 }
 
-export type CompletionMode = 'null' | 'parameter' | 'resource' | 'parameterValue'; //TODO: make null not-a-string (it's just handy for debugging)
+export type CompletionMode = 'null' | 'parameter' | 'resource' | 'propertyValue'; //TODO: make null not-a-string (it's just handy for debugging)
