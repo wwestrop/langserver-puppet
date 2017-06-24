@@ -4,6 +4,12 @@
 	options.currentProperty = null;
     options.currentProperties = [];
     options.mode = 'null';
+
+    function debug(message) {
+        "use strict";
+
+        if (console) console.log(message);
+    }
 }
 
 TopLevelContainer =
@@ -17,7 +23,7 @@ TopLevelContainerStart =
 	containerType:TopLevelContainerType Whitespace id:Identifier Whitespace OptionalTopLevelArgumentList Whitespace '{'
 	{
         options.mode = 'resource';
-        // console.log(options.mode);
+        // debug(options.mode);
         options.currentContainer = id;
     	// console.debug('>> Begin top level container (' + containerType + ' : ' + id + ')');
     }
@@ -25,8 +31,10 @@ TopLevelContainerEnd =
 	'}'
     {
         options.mode = 'null';
-        // console.log(options.mode);
+        // debug(options.mode);
         options.currentContainer = null;
+        options.currentResource = null;
+        options.currentProperty = null;
     	// console.debug('<< End top level container');
     }
    
@@ -57,7 +65,7 @@ Declaration =
 	DeclarationPreamble Whitespace DeclarationBody Whitespace DeclarationEnd
     {
         options.mode = 'resource';
-        // console.log(options.mode);
+        // debug(options.mode);
     }
 
 DeclarationPreamble =
@@ -67,7 +75,7 @@ DeclarationPreamble =
         // console.debug('saw declaration for ' + options.currentResource);
 
         options.mode = 'parameter';
-        // console.log(options.mode);
+        // debug(options.mode);
 
         return options.currentResource;
     }
@@ -76,23 +84,32 @@ DelcarationNameEnd =
     Whitespace '{' // TODO: I would *like* for resource-completion mode to end as soon as the whitespace is typed, but that can be zero length. I've tried making a mandatory variant, but am having no luck. A tokenizer wouldn't help in this scenario either.
     {
         options.mode = 'null';
-        // console.log(options.mode);
+        options.currentProperty = null;
+        // debug(options.mode);
     }
     
 DeclarationBody =
 	PropertyAssignmentList
 
 PropertyAssignmentList =
-	PropertyAssignment Whitespace ',' Whitespace PropertyAssignmentList /
+	PropertyAssignment Whitespace PropertyAssignmentEnd Whitespace PropertyAssignmentList /
     PropertyAssignment Whitespace ','? /
     Whitespace
 
 PropertyAssignment = 
-	parameter:PropertyAssignmentPreamble Whitespace value:PropertyAssignmentValue
+	parameter:PropertyAssignmentPreamble Whitespace value:Expr
     {
         let assignment = { parameter: parameter, value: value };
         options.currentProperties.push(assignment);
         return assignment;
+    }
+
+PropertyAssignmentEnd = 
+    ','
+    {
+        options.currentProperty = null;
+        options.mode = 'parameter';
+        // debug(options.mode);
     }
     
 PropertyAssignmentPreamble =
@@ -100,17 +117,9 @@ PropertyAssignmentPreamble =
     {
     	options.currentProperty = parameter;
         options.mode = 'propertyValue';
-        // console.log(options.mode);
+        // debug(options.mode);
     	// console.debug('in context of parameter ' + parameter);
         return parameter;
-    }
-
-PropertyAssignmentValue =
-	value:Expr
-    {
-    	// console.debug('assigning value of ' + value + ' (ends parameter context of ' + options.currentProperty + ')');
-        options.currentProperty = null;
-    	return value;
     }
     
 DeclarationEnd = 

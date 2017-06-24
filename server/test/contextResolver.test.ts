@@ -256,4 +256,74 @@ describe('Resolving the auto-completion context', () => {
             // but that detail is not exposed by the method we're using here, would have to adapt it. 
         });
     });
+
+    describe('When in a manifest with more than one declaration', function() {
+        it('Switches into parameter-completion mode when inside the second resource declaration', function () {
+            // Arrange
+            const manifestContent = `class m {
+                file {'gg': 
+                    content => 'ff', 
+                    ensure => directory }
+                ->
+                service {'sshd': |`;
+            
+            // Act
+            const result = act(manifestContent);
+
+            // Assert
+            assert.instanceOf(result, ParameterContext);
+        });
+
+        it('Switches into parameter-value-completion mode after selecting a parameter in the second resource declaration', function () {
+            // Arrange
+            const manifestContent = `class m {
+                file {'gg': 
+                    content => 'ff', 
+                    ensure => directory }
+                ->
+                service {'sshd': 
+                    ensure => |`;
+            
+            // Act
+            const result = act(manifestContent);
+
+            // Assert
+            assert.instanceOf(result, ParameterValueContext);
+        });
+
+        it('Switches back into parameter-completion mode after assigning the parameter value in the second resource declaration', function () {
+            // Arrange
+            const manifestContent = `class m {
+                file {'gg': 
+                    content => 'ff', 
+                    ensure => directory }
+                ->
+                service {'sshd': 
+                    ensure => running, |`;
+            
+            // Act
+            const result = act(manifestContent);
+
+            // Assert
+            assert.instanceOf(result, ParameterContext);
+        });
+
+        it('Switches back into resource-completion mode after closing-off the second declaration', function () {
+            // Arrange
+            const manifestContent = `class m {
+                file {'gg': 
+                    content => 'ff', 
+                    ensure => directory }
+                ->
+                service {'sshd': 
+                    ensure => running, 
+                }|`;
+            
+            // Act
+            const result = act(manifestContent);
+
+            // Assert
+            assert.instanceOf(result, ResourceContext);
+        });
+    });
 });
