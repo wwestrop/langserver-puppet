@@ -1,7 +1,7 @@
 import { PuppetType } from '../types/puppetType';
 import { IResource } from '../types/IResource';
 
-let BuiltInResources: IResource[] = [
+const BuiltInResources: IResource[] = [
   {
       name: 'package',
       properties: [

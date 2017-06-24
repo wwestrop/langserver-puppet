@@ -149,7 +149,7 @@ describe('Resolving the auto-completion context', () => {
 
             // Assert
             assert.instanceOf(result, ParameterContext);
-            assertExpectedParameters(result, ['ensure', 'mode', 'content'])
+            assertExpectedParameters(result, ['ensure', 'mode', 'content', 'before', 'require', 'notify', 'subscribe'])
         });
         it.skip('Should list the parameters available for that resource (for a user-written class)', () => {
             throw "Test not implemented";
