@@ -2,7 +2,7 @@ import { ParseResult } from '../parser/parseResult';
 import { IResource } from './IResource';
 import { PuppetType } from './puppetType';
 import { ICompletionContext } from '../completionContexts/ICompletionContext';
-import * as Parser from '../parser/parser';
+import * as Parser from '../parser/parser.generated';
 import BuiltInResources from '../consts/builtInResources'
 import { ParameterContext } from "../completionContexts/ParameterContext";
 import { ParameterValueContext } from "../completionContexts/ParameterValueContext";
