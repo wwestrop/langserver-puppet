@@ -241,19 +241,82 @@ describe('Resolving the auto-completion context', () => {
             // Assert
             assert.instanceOf(result, NoOpContext);
         });
-        it('Should revert to parameter-completion mode once we\'ve assigned a value', function() {
-            // Arrange
-            const manifestContent = `class myClass {
-                file { '/var/log/nginx.log': 
-                    mode => '0777',|`;
-            
-            // Act
-            const result = act(manifestContent);
+        
+        describe('Should revert to parameter-completion mode once we\'ve assigned a value', function() {
+            it('When that value is single-quoted', function() {
+                // Arrange
+                const manifestContent = `class myClass {
+                    file { '/var/log/nginx.log': 
+                        mode => '0777',|`;
+                
+                // Act
+                const result = act(manifestContent);
 
-            // Assert
-            assert.instanceOf(result, ParameterContext);
-            // TODO - should probably test here that the ParmeterContext is for the proper resource,
-            // but that detail is not exposed by the method we're using here, would have to adapt it. 
+                // Assert
+                assert.instanceOf(result, ParameterContext);
+                // TODO - should probably test here that the ParmeterContext is for the proper resource,
+                // but that detail is not exposed by the method we're using here, would have to adapt it. 
+            });
+
+            it('When that value is double-quoted', function() {
+                // Arrange
+                const manifestContent = `class myClass {
+                    file { '/varlog/nginx.log': 
+                        mode => "0777",|`;
+                
+                // Act
+                const result = act(manifestContent);
+
+                // Assert
+                assert.instanceOf(result, ParameterContext);
+                // TODO - should probably test here that the ParmeterContext is for the proper resource,
+                // but that detail is not exposed by the method we're using here, would have to adapt it. 
+            });
+
+            it('When that value is not quoted', function() {
+                // Arrange
+                const manifestContent = `class myClass {
+                    file { '/var/log/nginx.log': 
+                        ensure => file,|`;
+                
+                // Act
+                const result = act(manifestContent);
+
+                // Assert
+                assert.instanceOf(result, ParameterContext);
+                // TODO - should probably test here that the ParmeterContext is for the proper resource,
+                // but that detail is not exposed by the method we're using here, would have to adapt it. 
+            });
+
+            it('When that value is a variable expression', function() {
+                // Arrange
+                const manifestContent = `class myClass {
+                    file { '/var/log/nginx.log': 
+                        content => $myFileContent,|`;
+                
+                // Act
+                const result = act(manifestContent);
+
+                // Assert
+                assert.instanceOf(result, ParameterContext);
+                // TODO - should probably test here that the ParmeterContext is for the proper resource,
+                // but that detail is not exposed by the method we're using here, would have to adapt it. 
+            });
+
+            it('When that value is a function expression', function() {
+                // Arrange
+                const manifestContent = `class myClass {
+                    file { '/var/log/nginx.log': 
+                        content => epp('foo.conf.epp, $vals),|`;
+                
+                // Act
+                const result = act(manifestContent);
+
+                // Assert
+                assert.instanceOf(result, ParameterContext);
+                // TODO - should probably test here that the ParmeterContext is for the proper resource,
+                // but that detail is not exposed by the method we're using here, would have to adapt it. 
+            });
         });
     });
 

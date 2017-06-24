@@ -176,7 +176,7 @@ UnquotedStringExpression =	// Used for enum values, strictly they are strings to
     }
 
 DblQuotStringExpression = 
-    '\"' value:[^']* '\"'
+    '\"' value:[^"]* '\"'
     {
     	return value.join('');
     }
