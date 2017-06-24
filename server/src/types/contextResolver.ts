@@ -3,17 +3,20 @@ import { IResource } from './IResource';
 import { PuppetType } from './puppetType';
 import { ICompletionContext } from '../completionContexts/ICompletionContext';
 import * as Parser from '../parser/parser.generated';
-import BuiltInResources from '../consts/builtInResources'
 import { ParameterContext } from "../completionContexts/ParameterContext";
 import { ParameterValueContext } from "../completionContexts/ParameterValueContext";
 import { ResourceContext } from "../completionContexts/ResouceContext";
 import { NoOpContext } from "../completionContexts/NoOpContext";
+import { IResourceFinder } from "../resourceFinder/IResourceFinder";
 
 
 /** Resolves the 'context' in which an autocompletion is being requested.
  *  This means, different options will be surfaced depending what the user is doing at that point. 
  */
 export class ContextResolver {
+
+    public constructor(private readonly resourceFinder: IResourceFinder) {
+    }
 
     public resolve(documentText: string, insertionPoint: number): ICompletionContext {
 
@@ -40,7 +43,7 @@ export class ContextResolver {
             // Look up the type information about the parameter being entered
 
             if(!parseOutput.currentResource) throw "This scenario shouldn't arise";
-            const resInfo = this.findTypeInfo(parseOutput.currentResource);
+            const resInfo = this.resourceFinder.findResource(parseOutput.currentResource);
 
             if (resInfo) {
                 const parmInfo = resInfo.properties.find(p => p.name == parseOutput.currentProperty);
@@ -54,35 +57,17 @@ export class ContextResolver {
         else if (parseOutput.mode === 'parameter') {
             // Look up the type information about the parameters available on this resource
             if(!parseOutput.currentResource) throw "This scenario shouldn't arise";
-            const resInfo = this.findTypeInfo(parseOutput.currentResource);
+            const resInfo = this.resourceFinder.findResource(parseOutput.currentResource);
 
             if(resInfo) {
                 return new ParameterContext(resInfo);
             }
         }
         else if (parseOutput.mode === 'resource') {
-            return new ResourceContext();
+            const allResources = this.resourceFinder.findAllResources();
+            return new ResourceContext(allResources);
         }
 
         return new NoOpContext();
-    }
-
-    private findTypeInfo(resourceName: string): IResource | null {
-
-        // Search the Puppet built-in types
-        const typeInfo = BuiltInResources.find(r => r.name === resourceName);
-        if(typeInfo) {
-            return typeInfo;
-        }
-
-        // TODO: Search....
-        //         The current directory/tree?
-        //         Some user-configured module path?
-        //         An R10K file?
-        //         Puppet Forge?
-        //         Some other module repository?
-
-        // No matching resource found
-        return null;
     }
 }

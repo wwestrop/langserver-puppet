@@ -7,13 +7,14 @@ import { ParameterContext } from "../src/completionContexts/ParameterContext";
 import { NoOpContext } from "../src/completionContexts/NoOpContext";
 import { ResourceContext } from "../src/completionContexts/ResouceContext";
 import { ParameterValueContext } from "../src/completionContexts/ParameterValueContext";
+import { FakeResourceFinder } from "./fakes/fakeResourceFinder";
 
 describe('Resolving the auto-completion context', () => {
 
     let sut: ContextResolver;
 
     beforeEach(() => {
-        sut = new ContextResolver();
+        sut = new ContextResolver(new FakeResourceFinder());
     });
 
     /** The pipe character, '|' in the input is used to denote the caret position */

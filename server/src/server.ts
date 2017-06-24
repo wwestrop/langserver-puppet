@@ -1,11 +1,3 @@
-import { ContextResolver } from './types/contextResolver';
-import { ICompletionContext } from './completionContexts/ICompletionContext';
-/* --------------------------------------------------------------------------------------------
-* Copyright (c) Microsoft Corporation. All rights reserved.
-* Licensed under the MIT License. See License.txt in the project root for license information.
-* ------------------------------------------------------------------------------------------ */
-'use strict';
-
 import {
 	IPCMessageReader, IPCMessageWriter,
 	createConnection, IConnection, TextDocumentSyncKind,
@@ -17,6 +9,8 @@ import {
 import { IResource } from './types/IResource'
 import { IProperty } from './types/IProperty'
 import { PuppetType } from './types/PuppetType'
+import { DefaultResourceFinder } from './resourceFinder/DefaultResourceFinder';
+import { ContextResolver } from "./types/contextResolver";
 
 
 // Create a connection for the server. The connection uses Node's IPC as a transport
@@ -76,7 +70,8 @@ connection.onCompletion((textDocumentPosition: TextDocumentPositionParams): Comp
 	if (!relevantDocument) return [];
 
     const index = relevantDocument.offsetAt(textDocumentPosition.position);
-	const completionContext = new ContextResolver().resolve(relevantDocument.getText(), index);
+	const contextResolver = new ContextResolver(new DefaultResourceFinder());
+	const completionContext = contextResolver.resolve(relevantDocument.getText(), index);
 
 	return completionContext.getCompletionItems();
 
@@ -97,16 +92,6 @@ connection.onCompletion((textDocumentPosition: TextDocumentPositionParams): Comp
 	// info and always provide the same completion items.
 
 });
-
-
-/** Reads backwards from the current insertion point to determine what "scope" the editor is in,
- *  and hence what information the user will want available for autocompleting. 
- */
-function getScope(): ICompletionContext {
-	// TODO move to factory - use contextResolver
-	throw "Not implemented";
-}
-
 
 
 
