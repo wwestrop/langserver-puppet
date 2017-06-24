@@ -5,11 +5,20 @@
     options.currentProperties = [];
     options.mode = 'null';
 
-    function debug(message) {
-        "use strict";
+    const debugMode = false;
+    const debug = {
+        log: function(message) {
+            "use strict";
 
-        if (console) console.log(message);
-    }
+            if (console && debugMode) {
+                console.log(message);
+            }
+        },
+        logMode: function() {
+            "use strict";
+            debug.log(options.mode);
+        }
+    };
 }
 
 TopLevelContainer =
@@ -23,7 +32,7 @@ TopLevelContainerStart =
 	containerType:TopLevelContainerType Whitespace id:Identifier Whitespace OptionalTopLevelArgumentList Whitespace '{'
 	{
         options.mode = 'resource';
-        // debug(options.mode);
+        debug.logMode();
         options.currentContainer = id;
     	// console.debug('>> Begin top level container (' + containerType + ' : ' + id + ')');
     }
@@ -31,7 +40,7 @@ TopLevelContainerEnd =
 	'}'
     {
         options.mode = 'null';
-        // debug(options.mode);
+        debug.logMode();
         options.currentContainer = null;
         options.currentResource = null;
         options.currentProperty = null;
@@ -65,7 +74,7 @@ Declaration =
 	DeclarationPreamble Whitespace DeclarationBody Whitespace DeclarationEnd
     {
         options.mode = 'resource';
-        // debug(options.mode);
+        debug.logMode();
     }
 
 DeclarationPreamble =
@@ -75,7 +84,7 @@ DeclarationPreamble =
         // console.debug('saw declaration for ' + options.currentResource);
 
         options.mode = 'parameter';
-        // debug(options.mode);
+        debug.logMode();
 
         return options.currentResource;
     }
@@ -85,7 +94,7 @@ DelcarationNameEnd =
     {
         options.mode = 'null';
         options.currentProperty = null;
-        // debug(options.mode);
+        debug.logMode();
     }
     
 DeclarationBody =
@@ -109,7 +118,7 @@ PropertyAssignmentEnd =
     {
         options.currentProperty = null;
         options.mode = 'parameter';
-        // debug(options.mode);
+        debug.logMode();
     }
     
 PropertyAssignmentPreamble =
@@ -117,7 +126,7 @@ PropertyAssignmentPreamble =
     {
     	options.currentProperty = parameter;
         options.mode = 'propertyValue';
-        // debug(options.mode);
+        debug.logMode();
     	// console.debug('in context of parameter ' + parameter);
         return parameter;
     }
