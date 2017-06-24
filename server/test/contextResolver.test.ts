@@ -303,6 +303,21 @@ describe('Resolving the auto-completion context', () => {
                 // but that detail is not exposed by the method we're using here, would have to adapt it. 
             });
 
+            it('When that value is a variable-interpolated string', function() {
+                // Arrange
+                const manifestContent = `class myClass {
+                    file { '/var/log/nginx.log': 
+                        content => "abc $myvariable blah\${anotherVariable}",|`;
+                
+                // Act
+                const result = act(manifestContent);
+
+                // Assert
+                assert.instanceOf(result, ParameterContext);
+                // TODO - should probably test here that the ParmeterContext is for the proper resource,
+                // but that detail is not exposed by the method we're using here, would have to adapt it. 
+            });
+
             it('When that value is a function expression', function() {
                 // Arrange
                 const manifestContent = `class myClass {
@@ -316,6 +331,57 @@ describe('Resolving the auto-completion context', () => {
                 assert.instanceOf(result, ParameterContext);
                 // TODO - should probably test here that the ParmeterContext is for the proper resource,
                 // but that detail is not exposed by the method we're using here, would have to adapt it. 
+            });
+
+            it('When that value is a hash expression', function() {
+                // Arrange
+                const manifestContent = `class myClass {
+                    acl { '/var/log/nginx.log': 
+                        content => epp('foo.conf.epp, $vals),|`;
+                
+                // Act
+                const result = act(manifestContent);
+
+                // Assert
+                assert.instanceOf(result, ParameterContext);
+                // TODO - should probably test here that the ParmeterContext is for the proper resource,
+                // but that detail is not exposed by the method we're using here, would have to adapt it. 
+                throw "notimplemented";
+            });
+
+            it('When that value is an array expression', function() {
+                // Arrange
+                const manifestContent = `class myClass {
+                    cron { 'cleanupTempFiles': 
+                        hour => [1, 5, 10],|`;
+                
+                // Act
+                const result = act(manifestContent);
+
+                // Assert
+                assert.instanceOf(result, ParameterContext);
+                // TODO - should probably test here that the ParmeterContext is for the proper resource,
+                // but that detail is not exposed by the method we're using here, would have to adapt it. 
+            });
+
+            it('When that value is a hash-array expression', function() {
+                // Arrange
+                const manifestContent = `class myClass {
+                    acl { 'c:/iislogs/': 
+                        permissions => [
+                            { 'identity' => 'BUILTIN\SYSTEM', 'permissions' => ['read'', 'execute'] },
+                            { 'identity' => 'BUILTIN\ADMINISTRATORS', 'permissions' => ['read', 'write'] }
+                        ], `
+                
+                // Act
+                const result = act(manifestContent);
+
+                // Assert
+                assert.instanceOf(result, ParameterContext);
+                // TODO - should probably test here that the ParmeterContext is for the proper resource,
+                // but that detail is not exposed by the method we're using here, would have to adapt it. 
+
+                throw "not implemented - is there an actual example of assigning a plain hash to a parameter?";
             });
         });
     });
