@@ -1,15 +1,14 @@
 import { ParseResult } from '../parser/parseResult';
 import { IResource } from './IResource';
 import { PuppetType } from './puppetType';
-import {
-    ICompletionContext,
-    NoOpContext,
-    ParameterContext,
-    ParameterValueContext,
-    ResourceContext
-} from '../completionContexts/ICompletionContext';
+import { ICompletionContext } from '../completionContexts/ICompletionContext';
 import * as Parser from '../parser/parser';
 import BuiltInResources from '../consts/builtInResources'
+import { ParameterContext } from "../completionContexts/ParameterContext";
+import { ParameterValueContext } from "../completionContexts/ParameterValueContext";
+import { ResourceContext } from "../completionContexts/ResouceContext";
+import { NoOpContext } from "../completionContexts/NoOpContext";
+
 
 /** Resolves the 'context' in which an autocompletion is being requested.
  *  This means, different options will be surfaced depending what the user is doing at that point. 

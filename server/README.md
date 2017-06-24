@@ -29,4 +29,4 @@ Ideally, these would need to be resolved before tackling any extra features from
 * Argument tips for functions such as `each`, `epp`, `versioncmp`, [and so forth](https://docs.puppet.com/puppet/4.10/function.html)
   * When using a templating function, a nice feature would be to parse the variables out of the template files and present them to the user for auto-completion.
 * Providing pop-up documentation for types and parameters, in addition to just their names.
-* When declaring a reference to a resource in the format `ResourceType['name']`, autocompletion could provide the appropriate list of resource names.
+* When declaring a reference to a resource in the format `ResourceType['name']`, autocompletion could provide the appropriate list of resource names (and for the case of `Class['name']`, assistance should be available for the name as well).

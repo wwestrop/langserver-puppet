@@ -1,14 +1,12 @@
-import {
-    ICompletionContext,
-    NoOpContext,
-    ParameterContext,
-    ParameterValueContext,
-    ResourceContext
-} from '../src/completionContexts/ICompletionContext';
+import { ICompletionContext } from '../src/completionContexts/ICompletionContext';
 import { ContextResolver } from '../src/types/ContextResolver'
 
 import { assert } from 'chai';
 import 'mocha';
+import { ParameterContext } from "../src/completionContexts/ParameterContext";
+import { NoOpContext } from "../src/completionContexts/NoOpContext";
+import { ResourceContext } from "../src/completionContexts/ResouceContext";
+import { ParameterValueContext } from "../src/completionContexts/ParameterValueContext";
 
 describe('Resolving the auto-completion context', () => {
 
