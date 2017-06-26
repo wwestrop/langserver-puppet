@@ -35,7 +35,7 @@ connection.onInitialize((params): InitializeResult => {
 			// Tell the client that the server support code complete
 			completionProvider: {
 				resolveProvider: false,
-				triggerCharacters: [':', '=>', '\t', ',', '\r', '\n', ' ']	// only plain chars appear to actually work
+				triggerCharacters: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
 			}
 		}
 	}

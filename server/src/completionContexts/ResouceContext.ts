@@ -18,6 +18,7 @@ export class ResourceContext implements ICompletionContext {
 				return {
 					label: p.name,
 					kind: CompletionItemKind.Class,
+					documentation: p.description,
 				}
 			});
 
