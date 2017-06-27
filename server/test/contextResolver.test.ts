@@ -386,6 +386,37 @@ describe('Resolving the auto-completion context', () => {
     });
 
     describe('When in a manifest with more than one declaration', function() {
+        it('Immediately after the first resource, switches into resource-completion mode to assist with the second', () => {
+            // Arrange
+            const manifestContent = `class m {
+                file {'gg': 
+                    content => 'ff', 
+                    ensure => directory }
+                -> |`;
+
+            // Act
+            const result = act(manifestContent);
+
+            // Assert
+            assert.instanceOf(result, ResourceContext);
+        });
+
+        it('No completion suggestions available for the second resource\'s preamble', () => {
+            // Arrange
+            const manifestContent = `class m {
+                file {'gg': 
+                    content => 'ff', 
+                    ensure => directory }
+                ->
+                service { |`;
+
+            // Act
+            const result = act(manifestContent);
+
+            // Assert
+            assert.instanceOf(result, NoOpContext);
+        });
+
         it('Switches into parameter-completion mode when inside the second resource declaration', function () {
             // Arrange
             const manifestContent = `class m {
