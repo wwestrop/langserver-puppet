@@ -56,8 +56,8 @@ TopLevelArgumentList =
     / TopLevelArgument
 
 TopLevelArgument =
-	Identifier Whitespace Identifier
-    / Identifier
+	Identifier Whitespace Variable
+    / Variable
 
 ManifestContent = 
 	Declaration Whitespace DeclarationConnector Whitespace ManifestContent
@@ -141,7 +141,7 @@ DeclarationEnd =
     }
 
 Identifier =
-	([a-z][a-zA-Z0-9_]*)
+	([a-zA-Z0-9_]+)
     {
     	return text();
     }
@@ -154,9 +154,24 @@ Title =
 
 Expr = 
 	FuncExpr /
+    ArrayLookupExpr /
+    ArrayLiteralExpr /
 	StringExpr /
+    Variable /
     Identifier
     // TODO: Hash expression
+
+ArrayLookupExpr = 
+    Variable Whitespace ArrayLiteralExpr /
+    Identifier Whitespace ArrayLiteralExpr
+
+ArrayLiteralExpr = 
+    '[' Whitespace ExprList Whitespace ']'
+
+ExprList = 
+    Expr Whitespace "," Whitespace ExprList /
+    Expr /
+    Whitespace
 
 FuncExpr =
 	Identifier Whitespace '(' Whitespace FuncParamList Whitespace ')'
@@ -190,7 +205,6 @@ SngQuotStringExpression =
 StringExpr = 
 	SngQuotStringExpression /
     DblQuotStringExpression /
-    Variable /
     UnquotedStringExpression
     
 Variable = 

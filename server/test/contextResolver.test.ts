@@ -229,7 +229,7 @@ describe('Resolving the auto-completion context', () => {
         });
         
         describe('Should revert to parameter-completion mode once we\'ve assigned a value', function() {
-            it('When that value is single-quoted', function() {
+            it('When that value is a single-quoted string', function() {
                 // Arrange
                 const manifestContent = `class myClass {
                     file { '/var/log/nginx.log': 
@@ -244,7 +244,7 @@ describe('Resolving the auto-completion context', () => {
                 // but that detail is not exposed by the method we're using here, would have to adapt it. 
             });
 
-            it('When that value is double-quoted', function() {
+            it('When that value is a double-quoted string', function() {
                 // Arrange
                 const manifestContent = `class myClass {
                     file { '/varlog/nginx.log': 
@@ -259,7 +259,7 @@ describe('Resolving the auto-completion context', () => {
                 // but that detail is not exposed by the method we're using here, would have to adapt it. 
             });
 
-            it('When that value is not quoted', function() {
+            it('When that value is an unquoted string (e.g. an enum value)', function() {
                 // Arrange
                 const manifestContent = `class myClass {
                     file { '/var/log/nginx.log': 
@@ -365,11 +365,26 @@ describe('Resolving the auto-completion context', () => {
                 throw "notimplemented";
             });
 
-            it('When that value is an array expression', function() {
+            it('When that value is an array literal', function() {
                 // Arrange
                 const manifestContent = `class myClass {
                     cron { 'cleanupTempFiles': 
                         hour => [1, 5, 10],|`;
+                
+                // Act
+                const result = act(manifestContent);
+
+                // Assert
+                assert.instanceOf(result, ParameterContext);
+                // TODO - should probably test here that the ParmeterContext is for the proper resource,
+                // but that detail is not exposed by the method we're using here, would have to adapt it. 
+            });
+
+            it('When that value is an array lookup expression', function() {
+                // Arrange
+                const manifestContent = `class myClass {
+                    file { '/foo/bar/': 
+                        content => $facts['osfamily'],|`;
                 
                 // Act
                 const result = act(manifestContent);
@@ -398,6 +413,21 @@ describe('Resolving the auto-completion context', () => {
                 // but that detail is not exposed by the method we're using here, would have to adapt it. 
 
                 throw "not implemented - is there an actual example of assigning a plain hash to a parameter?";
+            });
+
+            it('When that value is a resource reference metaparameter', function() {
+                // Arrange
+                const manifestContent = `class myClass {
+                    file { '/etc/nginx.conf': 
+                        notify => Service['nginx'],|`;
+                
+                // Act
+                const result = act(manifestContent);
+
+                // Assert
+                assert.instanceOf(result, ParameterContext);
+                // TODO - should probably test here that the ParmeterContext is for the proper resource,
+                // but that detail is not exposed by the method we're using here, would have to adapt it. 
             });
         });
     });
