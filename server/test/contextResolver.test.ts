@@ -48,7 +48,7 @@ describe('Resolving the auto-completion context', () => {
             // Assert
             assert.instanceOf(result, NoOpContext);
         });
-        it('No completion suggestions available in a partially-written resource-definition preamble', () => {
+        it('No completion suggestions available in a partially-written top-level preamble', () => {
             // Arrange
             const manifestContent = `declare myresource`;
 
@@ -101,20 +101,7 @@ describe('Resolving the auto-completion context', () => {
             // Assert
             assert.instanceOf(result, ResourceContext);
         });
-        it.skip('Should narrow the suggested resources based upon what has already been typed', () => {
-            // Arrange
-            const manifestContent = `class myclass { 
-                \t service {'sshd':
-                    \t en|`;
-            
-            // Act
-            const result = act(manifestContent);
-
-            // Assert
-            assert.instanceOf(result, ResourceContext);
-            assertExpectedParameters(result, ['enabled', 'ensure']);
-        });
-        it.skip('Immediately after the resource type is finalised, should stop providing this assistance', () => {
+        it('Immediately after the resource type is finalised (before the title is entered), should stop providing this assistance', () => {
             // Arrange
             const manifestContent = `class myclass { 
                 \t service {`;
@@ -292,6 +279,36 @@ describe('Resolving the auto-completion context', () => {
                 const manifestContent = `class myClass {
                     file { '/var/log/nginx.log': 
                         content => $myFileContent,|`;
+                
+                // Act
+                const result = act(manifestContent);
+
+                // Assert
+                assert.instanceOf(result, ParameterContext);
+                // TODO - should probably test here that the ParmeterContext is for the proper resource,
+                // but that detail is not exposed by the method we're using here, would have to adapt it. 
+            });
+
+            it('When that value is a fully-qualified root-namespace variable', function() {
+                // Arrange
+                const manifestContent = `class myClass {
+                    file { '/var/log/nginx.log': 
+                        content => $::myFileContent,|`;
+                
+                // Act
+                const result = act(manifestContent);
+
+                // Assert
+                assert.instanceOf(result, ParameterContext);
+                // TODO - should probably test here that the ParmeterContext is for the proper resource,
+                // but that detail is not exposed by the method we're using here, would have to adapt it. 
+            });
+
+            it('When that value is a fully-qualified variable expression', function() {
+                // Arrange
+                const manifestContent = `class myClass {
+                    file { '/var/log/nginx.log': 
+                        content => $namespace::myFileContent,|`;
                 
                 // Act
                 const result = act(manifestContent);
